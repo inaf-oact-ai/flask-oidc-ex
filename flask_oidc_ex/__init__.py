@@ -415,6 +415,13 @@ class OpenIDConnect(object):
         if getattr(g, 'oidc_id_token_dirty', False):
             if g.oidc_id_token:
                 signed_id_token = self.cookie_serializer.dumps(g.oidc_id_token)
+                
+                ##### FIX ADDED BY SIMONE ############################
+                # Compatibility with Werkzeug expecting a string cookie value
+                if isinstance(signed_id_token, bytes):
+                    signed_id_token = signed_id_token.decode('utf-8')
+                ################################################################## 
+                
                 response.set_cookie(
                     current_app.config['OIDC_ID_TOKEN_COOKIE_NAME'],
                     signed_id_token,
