@@ -1,9 +1,8 @@
-include README.rst LICENSE.rst CHANGES.rst VERSION
-recursive-include docs *
-recursive-exclude docs *.pyc
-recursive-exclude docs *.pyo
-recursive-include example *
-recursive-exclude example *.pyc
-recursive-exclude example *.pyo
-prune docs/_build
-prune docs/_themes/.git
+include README.rst
+include LICENSE.txt
+recursive-include flask_oidc_ex *.py
+prune docs
+prune tests
+prune examples
+global-exclude __pycache__
+global-exclude *.py[cod]
