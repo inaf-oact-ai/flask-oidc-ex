@@ -39,7 +39,14 @@ from flask import Flask, request, session, redirect, url_for, g, current_app, ab
 from oauth2client.client import flow_from_clientsecrets, OAuth2WebServerFlow,\
     AccessTokenRefreshError, OAuth2Credentials
 import httplib2
-from itsdangerous import JSONWebSignatureSerializer, BadSignature, SignatureExpired
+
+##############################
+###   ADDED BY SIMONE
+##############################
+# - Comment line below and replace to support recent itsdangerous versions
+#from itsdangerous import JSONWebSignatureSerializer, BadSignature, SignatureExpired
+from itsdangerous import URLSafeSerializer, BadSignature, SignatureExpired
+###############################
 
 from .utils import _json_loads
 from .discovery import discover_OP_information
@@ -199,11 +206,20 @@ class OpenIDConnect(object):
                 cache=secrets_cache)
             assert isinstance(self.flow, OAuth2WebServerFlow)
 
+        ####################################################
+        ###   MODIFIED BY SIMONE
+        ####################################################
         # create signers using the Flask secret key
-        self.extra_data_serializer = JSONWebSignatureSerializer(
-            app.config['SECRET_KEY'], salt='flask-oidc-extra-data')
-        self.cookie_serializer = JSONWebSignatureSerializer(
-            app.config['SECRET_KEY'], salt='flask-oidc-cookie')
+        #self.extra_data_serializer = JSONWebSignatureSerializer(
+        #    app.config['SECRET_KEY'], salt='flask-oidc-extra-data')
+        #self.cookie_serializer = JSONWebSignatureSerializer(
+        #    app.config['SECRET_KEY'], salt='flask-oidc-cookie')
+            
+        self.extra_data_serializer = URLSafeSerializer(
+	          app.config['SECRET_KEY'], salt='flask-oidc-extra-data')
+        self.cookie_serializer = URLSafeSerializer(
+	          app.config['SECRET_KEY'], salt='flask-oidc-cookie')    
+        ##########################################################
 
         try:
             self.credentials_store = app.config['OIDC_CREDENTIALS_STORE']
@@ -606,9 +622,15 @@ class OpenIDConnect(object):
         if customstate is not None:
             statefield = 'custom'
             statevalue = customstate
-        state[statefield] = self.extra_data_serializer.dumps(
-            statevalue).decode('utf-8')
-
+            
+        ###################################################
+        ###  MODIFIED BY SIMONE    
+        #state[statefield] = self.extra_data_serializer.dumps(
+        #    statevalue).decode('utf-8')
+        state[statefield] = self.extra_data_serializer.dumps(statevalue)
+        ######################################################
+        
+        
         extra_params = {
             'state': urlsafe_b64encode(json.dumps(state).encode('utf-8')),
         }

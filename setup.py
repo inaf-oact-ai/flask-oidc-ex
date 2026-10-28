@@ -22,7 +22,8 @@ setup(
     ],
     install_requires=[
         'Flask',
-        'itsdangerous',
+        #'itsdangerous',
+        'itsdangerous>=2.2.0',
         'oauth2client',
         'six',
         'python-jwt',
